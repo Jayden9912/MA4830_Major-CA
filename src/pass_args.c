@@ -10,6 +10,9 @@ void readDefaultArgs(const char *default_config_path)
 
     int check_freq_float = 0;
     int check_amp_float = 0;
+    int check_freq_value = 0;
+    int check_amp_value = 0;
+    int wave_assignment = 0;
 
     // Buffer to hold read data
     char buffer1[20];
@@ -57,33 +60,8 @@ void readDefaultArgs(const char *default_config_path)
             // Only use default value when the user failed to provide value
             if (strcmp(buffer1, "wave") == 0)
             {
-                if (!strcmp(buffer2, "sine"))
-                {
-                    printf("Setting waveform as sine wave...\n");
-                    waveforms = 1;
-                    wave_valid = 1;
-                }
-
-                else if (!strcmp(buffer2, "triangular"))
-                {
-                    printf("Setting waveform as triangular wave...\n");
-                    waveforms = 2;
-                    wave_valid = 1;
-                }
-
-                else if (!strcmp(buffer2, "sawtooth"))
-                {
-                    printf("Setting waveform as sawtooth wave...\n");
-                    waveforms = 3;
-                    wave_valid = 1;
-                }
-                else if (!strcmp(buffer2, "square"))
-                {
-                    printf("Setting waveform as square wave...\n");
-                    waveforms = 4;
-                    wave_valid = 1;
-                }
-                else
+                wave_assignment = checkWaveform(buffer2);
+                if (wave_assignment)
                 {
                     printf("The default value provided for wave option is not a valid! Please fix the default config file!\n");
                     break;
@@ -92,19 +70,14 @@ void readDefaultArgs(const char *default_config_path)
             else if (strcmp(buffer1, "amplitude") == 0)
             {
                 check_amp_float = isValidFloat(buffer2);
-                if (check_amp_float == 0)
+                if (check_amp_float == 1)
                 {
                     printf("The default value provided for amplitude is not a valid float! Please fix the default config file!\n");
                     break;
                 }
                 tmp = strtod(buffer2, NULL);
-                if (tmp >= -5.0 && tmp <= 5.0)
-                {
-                    amp = tmp;
-                    amp_valid = 1;
-                    printf("Setting amplitude to %f...\n", tmp);
-                }
-                else
+                check_amp_value = checkAmpRange(tmp);
+                if (check_amp_value)
                 {
                     printf("The default value provided for amplitude is out of range! Please fix the default config file!\n");
                     break;
@@ -113,19 +86,14 @@ void readDefaultArgs(const char *default_config_path)
             else if (strcmp(buffer1, "frequency") == 0)
             {
                 check_freq_float = isValidFloat(buffer2);
-                if (check_freq_float == 0)
+                if (check_freq_float == 1)
                 {
                     printf("The default value provided for frequency is not a valid float! Please fix the default config file!\n");
                     break;
                 }
                 tmp = strtod(buffer2, NULL);
-                if (tmp >= 0.1 && tmp <= 10.0)
-                {
-                    freq = tmp;
-                    freq_valid = 1;
-                    printf("Setting frequency to %f...\n", tmp);
-                }
-                else
+                check_freq_value = checkFreqRange(tmp);
+                if (check_freq_value)
                 {
                     printf("The default value provided for freqeuncy is out of range! Please fix the default config file!\n");
                     break;
@@ -147,6 +115,9 @@ int passArgs(int argc, char *argv[])
     // variable for checking float given
     int check_freq_float = 0;
     int check_amp_float = 0;
+    int check_freq_value = 0;
+    int check_amp_value = 0;
+    int wave_assignment = 0;
 
     float tmp = 0.0;
 
@@ -176,36 +147,9 @@ int passArgs(int argc, char *argv[])
         switch (argv[2 * pointer_i + 1][1])
         {
         case 'w':
-            if (!strcmp(argv[2 * pointer_i + 2], "sine"))
-            {
-                printf("Setting waveform as sine wave...\n");
-                waveforms = 1;
-                wave_valid = 1;
+            wave_assignment = checkWaveform(argv[2 * pointer_i + 2]);
+            if (!wave_assignment)
                 break;
-            }
-
-            else if (!strcmp(argv[2 * pointer_i + 2], "triangular"))
-            {
-                printf("Setting waveform as triangular wave...\n");
-                waveforms = 2;
-                wave_valid = 1;
-                break;
-            }
-
-            else if (!strcmp(argv[2 * pointer_i + 2], "sawtooth"))
-            {
-                printf("Setting waveform as sawtooth wave...\n");
-                waveforms = 3;
-                wave_valid = 1;
-                break;
-            }
-            else if (!strcmp(argv[2 * pointer_i + 2], "square"))
-            {
-                printf("Setting waveform as square wave...\n");
-                waveforms = 4;
-                wave_valid = 1;
-                break;
-            }
             else
             {
                 printf("Invalid wave option.\n");
@@ -213,19 +157,15 @@ int passArgs(int argc, char *argv[])
             }
         case 'a':
             check_amp_float = isValidFloat(argv[2 * pointer_i + 2]);
-            if (check_amp_float == 0)
+            if (check_amp_float == 1)
             {
                 printf("Invalid float value is given for \n");
                 return 1;
             }
             tmp = strtod(argv[2 * pointer_i + 2], NULL);
-            if (tmp >= -5.0 && tmp <= 5.0)
-            {
-                amp = tmp;
-                amp_valid = 1;
-                printf("Setting amplitude to %f...\n", tmp);
+            check_amp_value = checkAmpRange(tmp);
+            if (check_amp_value == 0)
                 break;
-            }
             else
             {
                 printf("Amplitude value provided is out of range!\n");
@@ -233,19 +173,15 @@ int passArgs(int argc, char *argv[])
             }
         case 'f':
             check_freq_float = isValidFloat(argv[2 * pointer_i + 2]);
-            if (check_freq_float == 0)
+            if (check_freq_float == 1)
             {
                 printf("Invalid float value is given\n");
                 return 1;
             }
             tmp = strtod(argv[2 * pointer_i + 2], NULL);
-            if (tmp >= 0.1 && tmp <= 10.0)
-            {
-                freq = tmp;
-                freq_valid = 1;
-                printf("Setting frequency to %f...\n", tmp);
+            check_freq_value = checkFreqRange(tmp);
+            if (check_freq_value == 0)
                 break;
-            }
             else
             {
                 printf("Frequency value provided is out of range!\n");
@@ -276,7 +212,12 @@ int main(int argc, char *argv[])
     int state = 0;
 
     state = passArgs(argc, argv);
-
+    printf("%d\n", wave_valid);
+    printf("%d\n", freq_valid);
+    printf("%d\n", amp_valid);
+    printf("%d\n", waveforms);
+    printf("%f\n", freq);
+    printf("%f\n", amp);
     // problem encountered in parsing arguments
     if (state != 0)
     {
