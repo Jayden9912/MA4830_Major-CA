@@ -1,3 +1,5 @@
+#ifndef WAVES_H
+#define WAVES_H
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -34,8 +36,6 @@
 #define DA_FIFOCLR iobase[4] + 2 // Badr4 + 2
 
 int badr[5]; // PCI 2.2 assigns 6 IO base addresses
-
-int regenerate_wave = 1;
 // -----------------------------------------------
 struct pci_dev_info info;
 void *hdl;
@@ -47,3 +47,24 @@ uint16_t adc_in;
 unsigned int count;
 unsigned short chan;
 // -----------------------------------------------
+
+// This function setup PCI
+void setupPCI();
+
+// This function generates waveform based on the current value of waveforms, amplitude and frequency
+// Argument:
+//      waveforms: waveforms chosen
+//      amplitude: amplitude chosen
+//      frequency: frequency chosen
+void generateWave(const int waveforms, const float amplitude, const float frequency);
+
+// This function detachs PCI
+void detachPCI();
+
+// This function reads potentionmeter
+void *readADC();
+
+// This function reads digital switch
+void *readDIO();
+
+#endif
