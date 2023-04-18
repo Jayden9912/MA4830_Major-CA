@@ -2,10 +2,10 @@
 #define GLOBAL_ARGS_H
 #include <pthread.h>
 
-pthread_mutex_t mutex;
+extern pthread_mutex_t mutex;
 // default args file path
-const char *defaultfile;
-const char *userfile;
+extern const char *defaultfile;
+extern const char *userfile;
 
 // arguments
 extern float freq;     // 0.1 - 10.0 Hz
@@ -17,14 +17,13 @@ extern int waveforms;  // 1 = Sine wave
                        // 4 = Square wave
 
 // three variables for validation of the arguments
-int wave_valid;
-int freq_valid;
-int amp_valid;
+extern int wave_valid;
+extern int freq_valid;
+extern int amp_valid;
 
 // input conditions
-//0: kbd
-//1 :potentiometer
-int input_mode;
-
+// 0: kbd
+// 1 :potentiometer
+extern int input_mode;
 
 #endif

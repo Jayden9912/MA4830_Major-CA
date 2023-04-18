@@ -72,21 +72,21 @@ void generateWave(const int waveforms, const float amplitude, const float freque
 	case 1: // Sine wave
 		delta = (2.0 * 3.142) / steps;
 		for (i = 0; i < steps; i++)
-		{	printf("amp %f\n", amp); 
-		//pthread_mutex_lock(&mutex);
+		{
+			// printf("amp %f\n", amp);
+			// pthread_mutex_lock(&mutex);
 			dummy = ((sinf((float)(i * delta)) * amp + amp)) * (0xFFFF / 5);
-			//pthread_mutex_unlock(&mutex);
+			// pthread_mutex_unlock(&mutex);
 			data[i] = (unsigned)dummy;
-
 		}
 		break;
 	case 2: // Triangular wave
 		delta = (2 * amp) / (halfSteps);
 		for (i = 0; i <= halfSteps; i++)
 		{ // first half
-		//pthread_mutex_lock(&mutex);
+			// pthread_mutex_lock(&mutex);
 			dummy = i * delta * (0xFFFF / 5);
-			//pthread_mutex_unlock(&mutex);
+			// pthread_mutex_unlock(&mutex);
 			data[i] = (unsigned)dummy;
 		}
 		for (i = halfSteps + 1; i <= steps; i++)
@@ -96,9 +96,9 @@ void generateWave(const int waveforms, const float amplitude, const float freque
 		}
 		break;
 	case 3: // sawtooth
-	//pthread_mutex_lock(&mutex);
+			// pthread_mutex_lock(&mutex);
 		delta = (2 * amp) / (steps);
-		//pthread_mutex_unlock(&mutex);
+		// pthread_mutex_unlock(&mutex);
 		for (i = 0; i <= steps; i++)
 		{ // first half
 			dummy = i * delta * (0xFFFF / 5);
@@ -108,16 +108,16 @@ void generateWave(const int waveforms, const float amplitude, const float freque
 	case 4: // square
 		for (i = 0; i <= halfSteps; i++)
 		{ // first half
-		//pthread_mutex_lock(&mutex);
+			// pthread_mutex_lock(&mutex);
 			dummy = squareMinValue * (0xFFFF / 5) * amp;
-			//pthread_mutex_unlock(&mutex);
+			// pthread_mutex_unlock(&mutex);
 			data[i] = (unsigned)dummy;
 		}
 		for (i = halfSteps; i <= steps; i++)
 		{ // second half
-		//pthread_mutex_lock(&mutex);
+			// pthread_mutex_lock(&mutex);
 			dummy = (0xFFFF / 5) * (2 * amp);
-			//pthread_mutex_unlock(&mutex);
+			// pthread_mutex_unlock(&mutex);
 			data[i] = (unsigned)dummy;
 		}
 		break;
@@ -153,7 +153,7 @@ void detachPCI()
 	out16(DA_FIFOCLR, (short)0);
 	out16(DA_Data, 0x8fff);
 
-	printf("\n\n%-10s| PCI detached.\n", "[ERROR]");
+	printf("\n\n%-10s| PCI detached.\n", "[INFO]");
 	pci_detach_device(hdl);
 }
 
@@ -166,70 +166,73 @@ void *readADC()
 	// add a filter such that the amplitude and frequency are not changed too often due to noise
 	float amp_fluct_threshold = 0.03;
 	float freq_fluct_threshold = 0.03;
-	printf("input mode %d",input_mode);
+	// printf("input mode %d", input_mode);
 	while (1)
 	{
-		if (input_mode == 1){
-		out16(INTERRUPT, 0x60c0); // sets interrupts	 - Clears
-		out16(TRIGGER, 0x2081);	  // sets trigger control: 10MHz, clear, Burst off,SW trig. default:20a0
-		out16(AUTOCAL, 0x007f);	  // sets automatic calibration : default
-
-		out16(AD_FIFOCLR, 0);	// clear ADC buffer
-		out16(MUXCHAN, 0x0D00); // Write to MUX register - SW trigger, UP, SE, 5v, ch 0-0
-								// x x 0 0 | 1  0  0 1  | 0x 7   0 | Diff - 8 channels
-								// SW trig |Diff-Uni 5v| scan 0-7| Single - 16 channels
-
-		count = 0x00;
-
-		// read two potentiometers values
-		while (count < 0x02)
+		if (input_mode == 1)
 		{
-			chan = ((count & 0x0f) << 4) | (0x0f & count);
-			out16(MUXCHAN, 0x0D00 | chan); // Set channel	 - burst mode off.
-			delay(1);					   // allow mux to settle
-			out16(AD_DATA, 0);			   // start ADC
-			while (!(in16(MUXCHAN) & 0x4000));
-			adc_in = in16(AD_DATA);
-			if (count == 0x00)
-			{
-				// convert potentiometer 0 to new frequency
-				new_frequency = (adc_in / 65535.0) * 100.0;
-				if (new_frequency <= 1)
-				{
-					new_frequency = 1.0;
-				}
-				pthread_mutex_lock(&mutex);
-				diff_freq = fabs(new_frequency - freq);
-				// printf("diff_freq %f\n", diff_freq);
-				// printf("%d\n\n", (diff_freq > 0.01));
-				//  replace current frequency with new frequency if greater than threshold
+			out16(INTERRUPT, 0x60c0); // sets interrupts	 - Clears
+			out16(TRIGGER, 0x2081);	  // sets trigger control: 10MHz, clear, Burst off,SW trig. default:20a0
+			out16(AUTOCAL, 0x007f);	  // sets automatic calibration : default
 
-				if (diff_freq)
-				{
-					freq = new_frequency;
-				}
-				pthread_mutex_unlock(&mutex);
-				printf("Frequency Analogue: %f\n", freq);
-			}
-			else
+			out16(AD_FIFOCLR, 0);	// clear ADC buffer
+			out16(MUXCHAN, 0x0D00); // Write to MUX register - SW trigger, UP, SE, 5v, ch 0-0
+									// x x 0 0 | 1  0  0 1  | 0x 7   0 | Diff - 8 channels
+									// SW trig |Diff-Uni 5v| scan 0-7| Single - 16 channels
+
+			count = 0x00;
+
+			// read two potentiometers values
+			while (count < 0x02)
 			{
-				// convert potentiometer 1 to new amplitude
-				new_amplitude = (adc_in / 65535.0) * 2.5;
-				pthread_mutex_lock(&mutex);
-				diff_amp = abs(new_amplitude - amp);
-				// replace current amplitude with new amplitude if greater than threshold
-				if (!(diff_amp > amp_fluct_threshold))
+				chan = ((count & 0x0f) << 4) | (0x0f & count);
+				out16(MUXCHAN, 0x0D00 | chan); // Set channel	 - burst mode off.
+				delay(1);					   // allow mux to settle
+				out16(AD_DATA, 0);			   // start ADC
+				while (!(in16(MUXCHAN) & 0x4000))
+					;
+				adc_in = in16(AD_DATA);
+				if (count == 0x00)
 				{
-					amp = new_amplitude;
+					// convert potentiometer 0 to new frequency
+					new_frequency = (adc_in / 65535.0) * 100.0;
+					if (new_frequency <= 1)
+					{
+						new_frequency = 1.0;
+					}
+					pthread_mutex_lock(&mutex);
+					diff_freq = fabs(new_frequency - freq);
+					// printf("diff_freq %f\n", diff_freq);
+					// printf("%d\n\n", (diff_freq > 0.01));
+					//  replace current frequency with new frequency if greater than threshold
+
+					if (diff_freq)
+					{
+						freq = new_frequency;
+					}
+					pthread_mutex_unlock(&mutex);
+					// printf("Frequency Analogue: %f\n", freq);
 				}
-				pthread_mutex_unlock(&mutex);
-				// printf("Amplitude Analogue: %f\n", amp);
+				else
+				{
+					// convert potentiometer 1 to new amplitude
+					new_amplitude = (adc_in / 65535.0) * 2.5;
+					pthread_mutex_lock(&mutex);
+					diff_amp = abs(new_amplitude - amp);
+					// replace current amplitude with new amplitude if greater than threshold
+					if (!(diff_amp > amp_fluct_threshold))
+					{
+						amp = new_amplitude;
+					}
+					pthread_mutex_unlock(&mutex);
+					// printf("Amplitude Analogue: %f\n", amp);
+				}
+				// printf("ADC Chan: %02x Data [%3d]: %4d \n", chan, (int)count, (unsigned int)adc_in);		// print ADC
+				fflush(stdout);
+				count++;
+				delay(50); // Write to MUX register - SW trigger, UP, DE, 5v, ch 0-7
 			}
-			// printf("ADC Chan: %02x Data [%3d]: %4d \n", chan, (int)count, (unsigned int)adc_in);		// print ADC
-			fflush(stdout);
-			count++;
-			delay(50); // Write to MUX register - SW trigger, UP, DE, 5v, ch 0-7
-		}}
+		}
 	}
 }
 
@@ -239,7 +242,7 @@ void *readDIO()
 	{
 		out8(DIO_CTLREG, 0x90); // set Port A to output
 		dio_in = in8(DIO_PORTA);
-	// printf("DIO Port A : %2x\n", dio_in);
+		// printf("DIO Port A : %2x\n", dio_in);
 		out8(DIO_PORTB, dio_in); // write to Port B for display
 								 // delay(500);
 	}

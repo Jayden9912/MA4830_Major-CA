@@ -14,7 +14,7 @@ int calculateDuration()
     pthread_mutex_lock(&mutex);
     duration = 100 / freq;
     pthread_mutex_unlock(&mutex);
-    printf("duration: %f\n", duration);
+    // printf("duration: %f\n", duration);
     return (unsigned int)duration;
 }
 
