@@ -1,9 +1,11 @@
 #include "global_args.h"
 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+
 // default args file path
 const char *defaultfile = "default_config/default.dat";
 const char *userfile = "user_setting/setting.dat";
+
 // arguments
 float freq = 0.0;     // 0.1 - 10.0 Hz
 float duration = 0.0; // 0.02 - 0.002 s (1Hz - 10Hz)

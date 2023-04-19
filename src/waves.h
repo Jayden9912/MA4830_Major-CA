@@ -9,6 +9,8 @@
 #include <sys/mman.h>
 #include <math.h>
 #include <time.h>
+#include "global_args.h"
+#include "utils.h"
 
 #define INTERRUPT iobase[1] + 0 // Badr1 + 0 : also ADC register
 #define MUXCHAN iobase[1] + 2   // Badr1 + 2
@@ -42,6 +44,7 @@ void *hdl;
 
 uintptr_t iobase[6];
 uintptr_t dio_in;
+uintptr_t current_input;
 uint16_t adc_in;
 
 unsigned int count;

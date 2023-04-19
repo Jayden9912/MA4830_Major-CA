@@ -14,7 +14,7 @@ int calculateDuration()
     pthread_mutex_lock(&mutex);
     duration = 100 / freq;
     pthread_mutex_unlock(&mutex);
-    printf("duration: %f\n", duration);
+    // printf("duration: %.2f\n", duration);
     return (unsigned int)duration;
 }
 
@@ -70,7 +70,7 @@ int checkAmpRange(const float check_amp)
         amp = check_amp;
         amp_valid = 1;
         pthread_mutex_unlock(&mutex);
-        printf("%-10s| Setting amplitude to %f...\n", "[INFO]", check_amp);
+        printf("%-10s| Setting amplitude to %.2f...\n", "[INFO]", check_amp);
         return 0;
     }
     else
@@ -81,13 +81,13 @@ int checkAmpRange(const float check_amp)
 
 int checkFreqRange(const float check_freq)
 {
-    if (check_freq >= 1.0 && check_freq <= 10.0)
+    if (check_freq >= 1.0 && check_freq <= 100.0)
     {
         pthread_mutex_lock(&mutex);
         freq = check_freq;
         freq_valid = 1;
         pthread_mutex_unlock(&mutex);
-        printf("%-10s| Setting frequency to %f...\n", "[INFO]", freq);
+        printf("%-10s| Setting frequency to %.2f...\n", "[INFO]", freq);
         return 0;
     }
     else

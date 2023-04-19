@@ -33,7 +33,7 @@ void readDefaultArgs(const char *default_config_path)
         {
             if (ferror(fp))
             {
-            	printf("%-10s| ","[ERROR]");
+                printf("%-10s| ", "[ERROR]");
                 perror("Error encountered in reading the file!\n");
                 break;
             }
@@ -190,7 +190,7 @@ int passArgs(int argc, char *argv[])
                 return 1;
             }
         default:
-            printf("%-10s| Unexpected arguments %s given. Continue checking other arguments given.\n", "[INFO]", argv[2 * pointer_i + 1][1]);
+            printf("%-10s| Unexpected arguments %c given. Continue checking other arguments given.\n", "[INFO]", argv[2 * pointer_i + 1][1]);
         }
         pointer_i++;
     }
