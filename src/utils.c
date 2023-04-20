@@ -1,5 +1,6 @@
 #include "utils.h"
 
+// convert string to lower case
 void toLowerCase(char *str)
 {
     unsigned int i;
@@ -9,15 +10,16 @@ void toLowerCase(char *str)
     }
 }
 
+// calculate delay duration
 int calculateDuration()
 {
     pthread_mutex_lock(&mutex);
     duration = 100 / freq;
     pthread_mutex_unlock(&mutex);
-    // printf("duration: %.2f\n", duration);
     return (unsigned int)duration;
 }
 
+// check if the string is a valid float
 int isValidFloat(const char *str)
 {
     unsigned int i;
@@ -62,6 +64,7 @@ int isValidFloat(const char *str)
     return 0; // String represents a valid float
 }
 
+// check amplitude range from 0 to 2.5 v
 int checkAmpRange(const float check_amp)
 {
     if (check_amp >= 0 && check_amp <= 2.5)
@@ -79,6 +82,8 @@ int checkAmpRange(const float check_amp)
     }
 }
 
+
+// check frequency range from 1 to 100 hz 
 int checkFreqRange(const float check_freq)
 {
     if (check_freq >= 1.0 && check_freq <= 100.0)
@@ -96,6 +101,7 @@ int checkFreqRange(const float check_freq)
     }
 }
 
+// check wave type
 int checkWaveform(char *check_waveform)
 {
     toLowerCase(check_waveform);

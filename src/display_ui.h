@@ -9,10 +9,9 @@
 #include <pthread.h>
 #include <string.h>
 
-WINDOW* screen;
+WINDOW *screen;
 void print_instructions(WINDOW *instructions);
 void ncurses_init();
-
-void* display(void* arg);
+void *display(void *arg);
 
 #endif

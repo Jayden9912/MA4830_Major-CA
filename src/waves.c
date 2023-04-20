@@ -1,5 +1,6 @@
 #include "waves.h"
 
+// setup pci device
 void setupPCI()
 {
 	unsigned int i;
@@ -49,6 +50,7 @@ void setupPCI()
 	}
 }
 
+// output required wave to oscilloscope
 void generateWave(const int waveforms, const float amplitude, const float frequency)
 {
 	unsigned int i;
@@ -119,8 +121,8 @@ void generateWave(const int waveforms, const float amplitude, const float freque
 		}
 		break;
 	default:
-		//printf("%-10s| Invalid waveform selected\n", "[ERROR]");
-		strcpy (loginfo, "[Error]  Invalid waveform selected.");
+		// printf("%-10s| Invalid waveform selected\n", "[ERROR]");
+		strcpy(loginfo, "[Error]  Invalid waveform selected.");
 		exit(1);
 	}
 	pthread_mutex_unlock(&mutex);
@@ -151,12 +153,13 @@ void detachPCI()
 	out16(DA_FIFOCLR, (short)0);
 	out16(DA_Data, 0x8fff);
 
-	//printf("\n\n%-10s| PCI detached.\n", "[INFO]");
+	// printf("\n\n%-10s| PCI detached.\n", "[INFO]");
 	strcpy(loginfo, "[INFO]  PCI detached.");
 	pci_detach_device(hdl);
 }
 
-void *readADC(void* arg)
+// thread to read potentiometer input
+void *readADC(void *arg)
 {
 	float new_amplitude;
 	float new_frequency;
@@ -173,11 +176,10 @@ void *readADC(void* arg)
 			out16(INTERRUPT, 0x60c0); // sets interrupts	 - Clears
 			out16(TRIGGER, 0x2081);	  // sets trigger control: 10MHz, clear, Burst off,SW trig. default:20a0
 			out16(AUTOCAL, 0x007f);	  // sets automatic calibration : default
-
-			out16(AD_FIFOCLR, 0);	// clear ADC buffer
-			out16(MUXCHAN, 0x0D00); // Write to MUX register - SW trigger, UP, SE, 5v, ch 0-0
-									// x x 0 0 | 1  0  0 1  | 0x 7   0 | Diff - 8 channels
-									// SW trig |Diff-Uni 5v| scan 0-7| Single - 16 channels
+			out16(AD_FIFOCLR, 0);	  // clear ADC buffer
+			out16(MUXCHAN, 0x0D00);	  // Write to MUX register - SW trigger, UP, SE, 5v, ch 0-0
+									  // x x 0 0 | 1  0  0 1  | 0x 7   0 | Diff - 8 channels
+									  // SW trig |Diff-Uni 5v| scan 0-7| Single - 16 channels
 
 			count = 0x00;
 
@@ -201,16 +203,8 @@ void *readADC(void* arg)
 					}
 					pthread_mutex_lock(&mutex);
 					diff_freq = fabs(new_frequency - freq);
-					// printf("diff_freq %f\n", diff_freq);
-					// printf("%d\n\n", (diff_freq > 0.01));
-					//  replace current frequency with new frequency if greater than threshold
-
-				//	if (diff_freq)
-			//		{
-						freq = new_frequency;
-			//		}
+					freq = new_frequency;
 					pthread_mutex_unlock(&mutex);
-					// printf("Frequency Analogue: %.2f\n", freq);
 				}
 				else
 				{
@@ -218,13 +212,8 @@ void *readADC(void* arg)
 					new_amplitude = (adc_in / 65535.0) * 2.5;
 					pthread_mutex_lock(&mutex);
 					diff_amp = abs(new_amplitude - amp);
-					// replace current amplitude with new amplitude if greater than threshold
-			//		if (!(diff_amp > amp_fluct_threshold))
-			//		{
-						amp = new_amplitude;
-			//		}
+					amp = new_amplitude;
 					pthread_mutex_unlock(&mutex);
-					// printf("Amplitude Analogue: %f\n", amp);
 				}
 				// printf("ADC Chan: %02x Data [%3d]: %4d \n", chan, (int)count, (unsigned int)adc_in);		// print ADC
 				fflush(stdout);
@@ -235,7 +224,8 @@ void *readADC(void* arg)
 	}
 }
 
-void *readDIO(void* arg)
+// thread to read toggle switch state
+void *readDIO(void *arg)
 {
 	while (1)
 	{

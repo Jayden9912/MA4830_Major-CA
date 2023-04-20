@@ -2,35 +2,34 @@
 #include "kbd.h"
 #include "waves.h"
 #include "global_args.h"
-//#include "ui.h"
-#include "display_ui.h"
- 
+// #include "ui.h" // normal ui
+#include "display_ui.h" // naursese ui
+
 pthread_t thread[4];
 pthread_attr_t attr;
 int state = 0;
 
+// handle "ctrl + c"
 void signal_handler(int sig)
 {
 
-	//printf("\f");
-	system("clear");
-	 
-	// printf("\x1b[2J");
-	 printf("\x1b[H");
-   printf("SIGINT signal Received. Exiting Program\n");
-   // pthread_exit(NULL);
-      
-    detachPCI();
-   // printf("Main: program completed. Exiting.\n");
+    system("clear"); //clear terminal screen
+
+    // printf("\x1b[2J");
+    printf("\x1b[H"); // move the cursor to the top-left corner (home position) of the terminal or console window
+    printf("SIGINT signal Received. Exiting Program\n");
+    // pthread_exit(NULL);
+    detachPCI(); // detach pci device
     exit(0);
 }
 
+// main program
 int main(int argc, char *argv[])
 {
 
     signal(SIGINT, signal_handler);
     state = passArgs(argc, argv);
-	printf("\x1b[8;50;120t");
+    printf("\x1b[8;50;120t");
     // problem encountered in parsing arguments
     if (state != 0)
     {
@@ -42,71 +41,66 @@ int main(int argc, char *argv[])
         }
     }
     setupPCI();
-	printf("\nHit any key to continue\n");
-	getchar();
-	  
-   /* Initialize and set thread detached attribute */
-   pthread_attr_init(&attr);
+    printf("\nHit any key to continue\n");
+    getchar();
+
+    /* Initialize and set thread detached attribute */
+    pthread_attr_init(&attr);
 
     // Multithread creation
- pthread_create(&thread[0], &attr, &kbdUpdate, NULL);
-  pthread_create(&thread[1], &attr, &readDIO, NULL);
-    pthread_create(&thread[2], &attr, &readADC, NULL);
- // pthread_create(&thread[3], &attr, &print_interface, NULL);
-  pthread_create(&thread[3], &attr, &display, NULL);
+    pthread_create(&thread[0], &attr, &kbdUpdate, NULL); // thread for keyboard input
+    pthread_create(&thread[1], &attr, &readDIO, NULL); // thread for toggle switch input
+    pthread_create(&thread[2], &attr, &readADC, NULL); // thread for potentiometer input
+    // pthread_create(&thread[3], &attr, &print_interface, NULL); // thread for normal display
+    pthread_create(&thread[3], &attr, &display, NULL); // thread for ncurses display
 
     // Generating wave output
     while (1)
     {
-        generateWave(waveforms, amp, freq);
+        generateWave(waveforms, amp, freq); // generate wave by given wave type, amplitude and frequency
 
         // kills the program if the first switch is OFF
         if (dio_in == 0xf0)
         {
-            fflush(stdout);
-           system("clear");
-           	 //printf("\x1b[2J");
-			 printf("\x1b[H");
-			 
-           printf("Kill switch activated!");
+            fflush(stdout); // clear keyboard buffer
+            system("clear"); // clear terminal screen
+            // printf("\x1b[2J");
+            printf("\x1b[H");
+            printf("Kill switch activated!"); // master toggle switch is toggled
             printf("Exiting Program\n");
-            //input_mode = 2;
-           // clear()
-            //strcpy(loginfo, "[INFO]  Exiting Program.\n");
-            
-            
             break;
         }
-        
+
         // Keyboard input mode
         else if (dio_in == 0xf3)
         {
             fflush(stdout);
-            input_mode = 0;
-            if (current_input!=0xf3){
-           		//printf("%-10s| Input mode changed to keyboard\n", "[INFO]");
-           		//strcpy(loginfo, "[INFO] Input mode changed to keyboard.\n");
-           		}
+            input_mode = 0; // keyboard input mode
+            if (current_input != 0xf3)
+            {
+                // printf("%-10s| Input mode changed to keyboard\n", "[INFO]");
+                // strcpy(loginfo, "[INFO] Input mode changed to keyboard.\n");
+            }
             current_input = 0xf3;
         }
-        
+
         // Potentiometer input mode
-        else if (dio_in == 0xf5 )
+        else if (dio_in == 0xf5)
         {
             fflush(stdout);
             input_mode = 1;
-            if (current_input!=0xf5){
-            	//printf("%-10s| Input mode changed to potential meter\n", "[INFO]");
-            	//strcpy(loginfo, "[INFO] Input mode changed to potential meter.\n");
-            	}
+            if (current_input != 0xf5)
+            {
+                // printf("%-10s| Input mode changed to potential meter\n", "[INFO]");
+                // strcpy(loginfo, "[INFO] Input mode changed to potential meter.\n");
+            }
             current_input = 0xf5;
         }
         else
         {
-            input_mode = 2;		 // Invalid Option
+            input_mode = 2; // Invalid Option
         }
     }
 
-      
     return 0;
 }
