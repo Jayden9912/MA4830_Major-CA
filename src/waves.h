@@ -65,9 +65,9 @@ void generateWave(const int waveforms, const float amplitude, const float freque
 void detachPCI();
 
 // This function reads potentionmeter
-void *readADC();
+void *readADC(void* arg);
 
 // This function reads digital switch
-void *readDIO();
+void *readDIO(void* arg);
 
 #endif

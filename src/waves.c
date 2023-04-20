@@ -119,7 +119,8 @@ void generateWave(const int waveforms, const float amplitude, const float freque
 		}
 		break;
 	default:
-		printf("%-10s| Invalid waveform selected\n", "[ERROR]");
+		//printf("%-10s| Invalid waveform selected\n", "[ERROR]");
+		strcpy (loginfo, "[Error]  Invalid waveform selected.");
 		exit(1);
 	}
 	pthread_mutex_unlock(&mutex);
@@ -150,11 +151,12 @@ void detachPCI()
 	out16(DA_FIFOCLR, (short)0);
 	out16(DA_Data, 0x8fff);
 
-	printf("\n\n%-10s| PCI detached.\n", "[INFO]");
+	//printf("\n\n%-10s| PCI detached.\n", "[INFO]");
+	strcpy(loginfo, "[INFO]  PCI detached.");
 	pci_detach_device(hdl);
 }
 
-void *readADC()
+void *readADC(void* arg)
 {
 	float new_amplitude;
 	float new_frequency;
@@ -203,10 +205,10 @@ void *readADC()
 					// printf("%d\n\n", (diff_freq > 0.01));
 					//  replace current frequency with new frequency if greater than threshold
 
-					if (diff_freq)
-					{
+				//	if (diff_freq)
+			//		{
 						freq = new_frequency;
-					}
+			//		}
 					pthread_mutex_unlock(&mutex);
 					// printf("Frequency Analogue: %.2f\n", freq);
 				}
@@ -217,10 +219,10 @@ void *readADC()
 					pthread_mutex_lock(&mutex);
 					diff_amp = abs(new_amplitude - amp);
 					// replace current amplitude with new amplitude if greater than threshold
-					if (!(diff_amp > amp_fluct_threshold))
-					{
+			//		if (!(diff_amp > amp_fluct_threshold))
+			//		{
 						amp = new_amplitude;
-					}
+			//		}
 					pthread_mutex_unlock(&mutex);
 					// printf("Amplitude Analogue: %f\n", amp);
 				}
@@ -233,7 +235,7 @@ void *readADC()
 	}
 }
 
-void *readDIO()
+void *readDIO(void* arg)
 {
 	while (1)
 	{

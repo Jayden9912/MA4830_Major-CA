@@ -19,5 +19,4 @@ int waveforms = 0;    // 1 = Sine wave
 int wave_valid = 0;
 int freq_valid = 0;
 int amp_valid = 0;
-
 int input_mode = 0;

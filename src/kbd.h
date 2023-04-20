@@ -19,7 +19,7 @@
 // 4 for waveform square
 // amp: amplitude current: 0-2.5 future: 0-100
 // freq: frequency 1-10
-void *kbdUpdate();
+void *kbdUpdate(void* arg);
 
 // This function saves the user setting to the file setting.dat
 void save2file();

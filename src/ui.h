@@ -7,6 +7,6 @@
 #include "global_args.h"
 
 
-void* print_interface();
+void* print_interface(void* arg);
 
 #endif

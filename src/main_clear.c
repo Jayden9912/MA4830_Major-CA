@@ -4,6 +4,7 @@
 #include "global_args.h"
 //#include "ui.h"
 #include "display_ui.h"
+#include <ncurses.h>
  
 pthread_t thread[4];
 pthread_attr_t attr;
@@ -13,15 +14,30 @@ void signal_handler(int sig)
 {
 
 	//printf("\f");
-	system("clear");
+	refresh();
+   endwin();
+	//system("clear");
 	 
 	// printf("\x1b[2J");
-	 printf("\x1b[H");
-   printf("SIGINT signal Received. Exiting Program\n");
+	// printf("\x1b[H");
+  
+ //  refresh();
+   //endwin();
+   
    // pthread_exit(NULL);
-      
+      strcpy(loginfo, "[INFO]  Exiting Program.\n");
     detachPCI();
-   // printf("Main: program completed. Exiting.\n");
+    
+    system("clear");
+
+    //printf("Signal Received, exiting program\n"); 
+ 
+   // printf("Main: program completed.\n");
+
+   //system("clear");
+   
+    printf("Main: program completed.\n");
+    printf("\x1b[40H");
     exit(0);
 }
 
@@ -64,16 +80,19 @@ int main(int argc, char *argv[])
         if (dio_in == 0xf0)
         {
             fflush(stdout);
-           system("clear");
+           //system("clear");
            	 //printf("\x1b[2J");
-			 printf("\x1b[H");
+			 //printf("\x1b[40H");
 			 
-           printf("Kill switch activated!");
-            printf("Exiting Program\n");
+           //printf("Kill switch activated!");
+           // printf("Exiting Program\n");
             //input_mode = 2;
            // clear()
-            //strcpy(loginfo, "[INFO]  Exiting Program.\n");
-            
+            refresh();
+            endwin();
+            strcpy(loginfo, "[INFO]  Exiting Program.\n");
+			system("clear");
+			 printf("\x1b[40H");
             
             break;
         }

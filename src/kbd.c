@@ -7,7 +7,13 @@ void save2file()
     char buffer[100];
     char wave[12] = " ";
     FILE *setting;
-    setting = fopen(userfile, "w+");
+  //  setting = fopen(userfile, "w+");
+    
+    if((setting=fopen(userfile,"w"))==NULL){
+		perror("cannot open");
+		exit(1);
+	}
+
     if (waveforms == 1)
     {
         strcpy(wave, "sine");
@@ -24,13 +30,13 @@ void save2file()
     {
         strcpy(wave, "square");
     }
-    sprintf(buffer, "waveforms: %s\nfreq: %f\namp: %f", wave, freq, amp);
+    sprintf(buffer, "waveforms: %s\nfreq: %f\namp: %f\n", wave, freq, amp);
     fputs(buffer, setting);
     fclose(setting);
     // printf("Saved successfully.\n");
 }
 
-void *kbdUpdate()
+void *kbdUpdate( void* arg)
 {
     char c;
     system("stty -icanon");
@@ -54,7 +60,8 @@ void *kbdUpdate()
                 }
                 else if (freq < 2)
                 {
-                    printf("%-10s| Frequency cannot be lower than 1.\n", "[WARNING]");
+                    //printf("%-10s| Frequency cannot be lower than 1.\n", "[WARNING]");
+                    strcpy(loginfo, "[WARNING]  Frequency cannot be lower than 1.\n");
                 }
 
             }
@@ -71,7 +78,8 @@ void *kbdUpdate()
                 }
                 else if (freq > 99)
                 {
-                    printf("%-10s| Frequency cannot be higher than 100.\n", "[WARNING]");
+                	strcpy(loginfo, "[WARNING]  Frequency cannot be higher than 100.\n");
+                	 //printf("%-10s| Frequency cannot be higher than 100.\n", "[WARNING]");
                 }
 
             }
@@ -87,7 +95,8 @@ void *kbdUpdate()
                 }
                 else
                 {
-                    printf("%-10s| Amplitude cannot be higher than 2.5.\n", "[WARNING]");
+                   // printf("%-10s| Amplitude cannot be higher than 2.5.\n", "[WARNING]");
+                    strcpy(loginfo, "[WARNING]  Amplitude cannot be higher than 2.5.\n");
                 }
                
             }
@@ -103,7 +112,8 @@ void *kbdUpdate()
                 }
                 else
                 {
-                    printf("%-10s| Amplitude cannot be lower than 0\n", "[WARNING]");
+                   // printf("%-10s| Amplitude cannot be lower than 0\n", "[WARNING]");
+                    strcpy(loginfo, "[WARNING]  Amplitude cannot be lower than 0.\n");
                 }
                 
             }
@@ -137,7 +147,8 @@ void *kbdUpdate()
             }
             else
             {
-                printf("\a");
+                //printf("\a");
+                strcpy(loginfo, "[WARNING]  Invalid inputs, please follow the instructions.\n");
             }
         }
     }

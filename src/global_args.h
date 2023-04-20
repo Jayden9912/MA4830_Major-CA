@@ -20,6 +20,7 @@ extern int waveforms;  // 1 = Sine wave
 extern int wave_valid;
 extern int freq_valid;
 extern int amp_valid;
+char loginfo[70];
 
 // input conditions
 // 0: kbd
