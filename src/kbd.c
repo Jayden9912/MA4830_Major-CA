@@ -61,6 +61,7 @@ void *kbdUpdate(void *arg)
                 else if (freq < 2)
                 {
                     strcpy(loginfo, "[WARNING]  Frequency cannot be lower than 1.\n");
+                     printf("\a"); // Warning sound
                 }
             }
             else if (c == 'd')
@@ -77,6 +78,7 @@ void *kbdUpdate(void *arg)
                 else if (freq > 99)
                 {
                     strcpy(loginfo, "[WARNING]  Frequency cannot be higher than 100.\n");
+                     printf("\a"); // Warning sound
                 }
             }
             else if (c == 'w') // control amplitude of the wave
@@ -93,6 +95,7 @@ void *kbdUpdate(void *arg)
                 {
                     // printf("%-10s| Amplitude cannot be higher than 2.5.\n", "[WARNING]");
                     strcpy(loginfo, "[WARNING]  Amplitude cannot be higher than 2.5.\n");
+                     printf("\a"); // Warning sound
                 }
             }
             else if (c == 's')
@@ -109,6 +112,8 @@ void *kbdUpdate(void *arg)
                 {
                     // printf("%-10s| Amplitude cannot be lower than 0\n", "[WARNING]");
                     strcpy(loginfo, "[WARNING]  Amplitude cannot be lower than 0.\n");
+                     printf("\a"); // Warning sound
+                    
                 }
             }
             else if (c == '1') // sine wave
@@ -142,6 +147,7 @@ void *kbdUpdate(void *arg)
             else
             {
                 strcpy(loginfo, "[WARNING]  Invalid inputs, please follow the instructions.\n");
+                printf("\a"); // Warning sound
             }
         }
     }

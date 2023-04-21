@@ -3,7 +3,7 @@
 #include "waves.h"
 #include "global_args.h"
 // #include "ui.h" // normal ui
-#include "display_ui.h" // naursese ui
+#include "display_ui.h" // ncursese ui
 
 pthread_t thread[4];
 pthread_attr_t attr;
@@ -12,14 +12,17 @@ int state = 0;
 // handle "ctrl + c"
 void signal_handler(int sig)
 {
-
+ 	//printf("SIGINT signal Received. Exiting Program\n");
+	strcpy(loginfo,"SIGINT signal Received. Exiting Program");
     system("clear"); //clear terminal screen
-
     // printf("\x1b[2J");
     printf("\x1b[H"); // move the cursor to the top-left corner (home position) of the terminal or console window
-    printf("SIGINT signal Received. Exiting Program\n");
     // pthread_exit(NULL);
     detachPCI(); // detach pci device
+    refresh(); // refresh screen
+    endwin(); // close ncurses window
+      system("clear"); // clear terminal screen
+    printf("Program Exited!!!\n");
     exit(0);
 }
 
@@ -63,11 +66,18 @@ int main(int argc, char *argv[])
         if (dio_in == 0xf0)
         {
             fflush(stdout); // clear keyboard buffer
+            //printf("SIGINT signal Received. Exiting Program\n");
+			strcpy(loginfo,"SIGINT signal Received. Exiting Program");
             system("clear"); // clear terminal screen
             // printf("\x1b[2J");
             printf("\x1b[H");
             printf("Kill switch activated!"); // master toggle switch is toggled
             printf("Exiting Program\n");
+            detachPCI(); // detach pci device
+   			refresh(); // refresh screen
+   			endwin(); // close ncurses window
+   			  system("clear"); // clear terminal screen
+   			printf("Program Exited!!!\n");
             break;
         }
 
