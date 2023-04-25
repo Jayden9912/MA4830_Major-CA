@@ -10,8 +10,16 @@
 #include <string.h>
 
 WINDOW *screen;
+
+// This function is used to print the instructions on the screen
+// Argument:
+//  instructions: the pointer to ncurses window object
 void print_instructions(WINDOW *instructions);
+
+// This function is used to initialize the ncurses screen
 void ncurses_init();
+
+// This function is used to display all information on screen
 void *display(void *arg);
 
 #endif

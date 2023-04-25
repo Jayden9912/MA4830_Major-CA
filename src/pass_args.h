@@ -11,9 +11,7 @@
 //      argv: pointer to pointer of argument
 // Return:
 //      0: success
-//      1: no command line argument used
-//      2: invalid option
-//      3: choose default setting while providing values
+//      1: no command line argument used, invalid options
 int passArgs(int argc, char *argv[]);
 
 // This function reads the default values for all the arguments.

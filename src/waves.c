@@ -108,7 +108,7 @@ void generateWave(const int waveforms, const float amplitude, const float freque
 		for (i = 0; i <= halfSteps; i++)
 		{ // first half
 			// pthread_mutex_lock(&mutex);
-			dummy = squareMinValue * (0xFFFF / 5) * amp;
+			dummy = squareMinValue * (0xFFFF / 5) * (2 * amp);
 			// pthread_mutex_unlock(&mutex);
 			data[i] = (unsigned)dummy;
 		}
@@ -205,6 +205,7 @@ void *readADC(void *arg)
 					diff_freq = fabs(new_frequency - freq);
 					freq = new_frequency;
 					pthread_mutex_unlock(&mutex);
+					calculateDuration();
 				}
 				else
 				{
